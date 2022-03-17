@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-// A function that converts a response body into a List<Photo>.
+// A function that converts a response body into a List<Pokemon>.
 List<Pokemon> parsePokemon(String responseBody) {
   final parsed = jsonDecode(responseBody)['results'].cast<Map<String, dynamic>>();
 
@@ -16,7 +16,7 @@ Future<List<Pokemon>> fetchPokemon(http.Client client) async {
   final response = await client
       .get(Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=151'));
 
-  // Use the compute function to run parsePhotos in a separate isolate.
+  // Use the compute function to run parsePokemon in a separate isolate.
   return compute(parsePokemon, response.body);
 }
 
@@ -29,12 +29,19 @@ class Pokemon {
     required this.url,
   });
 
+
   factory Pokemon.fromJson(Map<String, dynamic> json) {
     return Pokemon(
       name: json['name'],
       url: json['url'],
     );
   }
+}
+
+class PokemonArguments {
+  final String pokemonId;
+
+  PokemonArguments(this.pokemonId);
 }
 
 void main() => runApp(const MyApp());
@@ -46,16 +53,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const appTitle = 'Pokemon API';
 
-    return const MaterialApp(
+    return MaterialApp(
       title: appTitle,
-      home: MyHomePage(title: appTitle),
+      home: const MyHomePage(title: appTitle),
+      routes: {
+        PokemonView.routeName: (context) =>
+        const PokemonView(),
+      },
     );
   }
 }
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
   final String title;
 
   @override
@@ -98,10 +108,27 @@ class PokemonList extends StatelessWidget {
       itemCount: pokemon.length,
       itemBuilder: (context, index) {
         return InkWell(
-            onTap: (){ print(pokemon[index].url); },
-            child: Image.network("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"+(index+1).toString()+".png"),
+            onTap: (){ Navigator.pushNamed(context, PokemonView.routeName, arguments: PokemonArguments((index+1).toString())); },
+            child: Image.network("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+(index+1).toString()+".png"),
             //
         );},
+    );
+  }
+}
+
+class PokemonView extends StatelessWidget {
+  const PokemonView({Key? key}) : super(key: key);
+  static const routeName = '/view';
+  @override
+  Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as PokemonArguments;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('View Pokemon'),
+      ),
+      body: Center(
+        child: Image.network("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/"+(args.pokemonId)+".png"),
+      ),
     );
   }
 }
