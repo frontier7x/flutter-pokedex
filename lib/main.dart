@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const appTitle = 'Pokemon API';
+    const appTitle = 'Pokemon Shiny Viewer';
 
     return const MaterialApp(
       title: appTitle,
@@ -101,8 +101,66 @@ class PokemonView extends StatelessWidget {
                 child: Text('${snapshot.error}'),
               );
             } else if (snapshot.hasData) {
+              return Column(
+                children: [
+                  Row(
+                    children: [
+                      Image.network(
+                        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/'+(pokemonId)+'.png',
+                        width: 200,
+                        height: 240,
+                        fit: BoxFit.cover,
+                      ),
+                      Image.network(
+                        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/'+(pokemonId)+'.png',
+                        width: 200,
+                        height: 240,
+                        fit: BoxFit.cover,
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(30),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Text(
+                                  snapshot.data!.name.toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                "Peso: "+snapshot.data!.weight.toString()+"gr",
+                                style: const TextStyle(
+                                  color: Colors.blueGrey,
+                                ),
+                              ),
+                              Text(
+                                "Altura: "+snapshot.data!.height.toString()+"cm",
+                                style: const TextStyle(
+                                  color: Colors.blueGrey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ]
+              );
               return GridTile(
-                child: Text(snapshot.data!.name),
+                child: Card(
+                  child: Text(snapshot.data!.name),
+                ),
                 header: Text(snapshot.data!.name),
               );
             } else {

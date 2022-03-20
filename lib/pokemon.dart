@@ -13,7 +13,7 @@ List<Pokemon> parsePokemon(String responseBody) {
 
 Future<List<Pokemon>> fetchPokemon(http.Client client) async {
   final response = await client
-      .get(Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=151'));
+      .get(Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=1000'));
 
   // Use the compute function to run parsePokemon in a separate isolate.
   return compute(parsePokemon, response.body);

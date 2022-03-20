@@ -38,9 +38,9 @@ class PokemonData {
   factory PokemonData.fromJson(Map<String, dynamic> json) {
     return PokemonData(
       name: json['name'],
-      weight: json['weight'],
+      weight: json['weight']*100,
       baseExperience: json['baseExperience'],
-      height: json['height'],
+      height: json['height']*10,
     );
   }
 }
