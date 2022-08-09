@@ -1,10 +1,7 @@
-
 import 'package:api_test_pokemon/pokemon.dart';
 import 'package:api_test_pokemon/pokemon_data.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-
 
 class PokemonArguments {
   final String pokemonId;
@@ -24,7 +21,6 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       title: appTitle,
       home: MyHomePage(title: appTitle),
-
     );
   }
 }
@@ -38,6 +34,7 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
+        backgroundColor: Colors.red,
       ),
       body: FutureBuilder<List<Pokemon>>(
         future: fetchPokemon(http.Client()),
@@ -67,17 +64,30 @@ class PokemonList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-      ),
+      gridDelegate:
+          const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
       itemCount: pokemon.length,
       itemBuilder: (context, index) {
-        return InkWell(
-            onTap: (){ Navigator.push(context, MaterialPageRoute(builder: (context) => PokemonView(pokemonId: (index+1).toString()))); },
-            child:
-            Image.network("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+(index+1).toString()+".png"),
-            //
-        );},
+        return IconButton(
+          iconSize: 50,
+          icon: Hero(
+            tag: "poke" + (index + 1).toString(),
+            child: Image.network(
+                "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/" +
+                    (index + 1).toString() +
+                    ".png"),
+          ),
+          hoverColor: Colors.amberAccent,
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        PokemonView(pokemonId: (index + 1).toString())));
+          },
+          //
+        );
+      },
     );
   }
 }
@@ -91,78 +101,78 @@ class PokemonView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('View Pokemon'),
+        backgroundColor: Colors.red,
       ),
       body: Center(
         child: FutureBuilder<PokemonData>(
           future: fetchPokemonDataView(http.Client(), pokemonId),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return  Center(
+              return Center(
                 child: Text('${snapshot.error}'),
               );
             } else if (snapshot.hasData) {
-              return Column(
-                children: [
-                  Row(
+              return Column(children: [
+                Hero(
+                  tag: "poke" + pokemonId,
+                  child: Image.network(
+                    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/" +
+                        pokemonId +
+                        ".png",
+                  ),
+                ),
+                const Text(
+                  'SPRITES',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Image.network(
+                      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
+                          (pokemonId) +
+                          '.png',
+                    ),
+                    Image.network(
+                      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/' +
+                          (pokemonId) +
+                          '.png',
+                    ),
+                  ],
+                ),
+                SafeArea(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Image.network(
-                        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/'+(pokemonId)+'.png',
-                        width: 200,
-                        height: 240,
-                        fit: BoxFit.cover,
+                      Container(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          snapshot.data!.name.toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.black87,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                      Image.network(
-                        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/'+(pokemonId)+'.png',
-                        width: 200,
-                        height: 240,
-                        fit: BoxFit.cover,
+                      Text(
+                        "Peso: " + snapshot.data!.weight.toString() + "gr",
+                        style: const TextStyle(
+                          color: Colors.blueGrey,
+                        ),
+                      ),
+                      Text(
+                        "Altura: " + snapshot.data!.height.toString() + "cm",
+                        style: const TextStyle(
+                          color: Colors.blueGrey,
+                        ),
                       ),
                     ],
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(30),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: Text(
-                                  snapshot.data!.name.toUpperCase(),
-                                  style: const TextStyle(
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                "Peso: "+snapshot.data!.weight.toString()+"gr",
-                                style: const TextStyle(
-                                  color: Colors.blueGrey,
-                                ),
-                              ),
-                              Text(
-                                "Altura: "+snapshot.data!.height.toString()+"cm",
-                                style: const TextStyle(
-                                  color: Colors.blueGrey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ]
-              );
-              return GridTile(
-                child: Card(
-                  child: Text(snapshot.data!.name),
                 ),
-                header: Text(snapshot.data!.name),
-              );
+              ]);
             } else {
               return const Center(
                 child: CircularProgressIndicator(),
@@ -173,7 +183,4 @@ class PokemonView extends StatelessWidget {
       ),
     );
   }
-
 }
-
-
